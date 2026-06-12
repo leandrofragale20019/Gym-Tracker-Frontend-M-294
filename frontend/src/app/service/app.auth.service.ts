@@ -1,98 +1,97 @@
 import { Injectable, inject } from '@angular/core';
-import {JwtHelperService} from '@auth0/angular-jwt';
-import {AuthConfig, OAuthErrorEvent, OAuthService} from 'angular-oauth2-oidc';
-import {BehaviorSubject, Observable, of} from 'rxjs';
+import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AppAuthService {
   private oauthService = inject(OAuthService);
   private authConfig = inject(AuthConfig);
 
-  private jwtHelper: JwtHelperService = new JwtHelperService();
-  private usernameSubject: BehaviorSubject<string> = new BehaviorSubject('');
+  private usernameSubject = new BehaviorSubject<string>('');
   public readonly usernameObservable: Observable<string> = this.usernameSubject.asObservable();
-  private useraliasSubject: BehaviorSubject<string> = new BehaviorSubject('');
+  private useraliasSubject = new BehaviorSubject<string>('');
   public readonly useraliasObservable: Observable<string> = this.useraliasSubject.asObservable();
-  private accessTokenSubject: BehaviorSubject<string> = new BehaviorSubject('');
-  public readonly accessTokenObservable: Observable<string> = this.accessTokenSubject.asObservable();
 
   constructor() {
-    this.handleEvents(null);
+    this.loadUserFromStorage();
   }
 
-  private _decodedAccessToken: any;
-
-  get decodedAccessToken() {
-    return this._decodedAccessToken;
+  
+  initAuth(): Promise<void> {
+    this.oauthService.configure(this.authConfig);
+    this.loadUserFromStorage();
+    return this.oauthService.loadDiscoveryDocument()
+      .then(() => {})
+      .catch(err => console.error('[AuthService] Discovery failed:', err));
   }
 
-  private _accessToken = '';
-
-  get accessToken() {
-    return this._accessToken;
-  }
-
-  async initAuth(): Promise<any> {
-    return new Promise<void>(() => {
-      this.oauthService.configure(this.authConfig);
-      this.oauthService.events
-        .subscribe(e => this.handleEvents(e));
-      this.oauthService.loadDiscoveryDocumentAndTryLogin();
-      this.oauthService.setupAutomaticSilentRefresh();
-    });
-  }
-
-  public getRoles(): Observable<Array<string>> {
-    if (this._decodedAccessToken !== null) {
-      return new Observable<Array<string>>(observer => {
-        if (this._decodedAccessToken.resource_access.demoapp.roles) {
-          if (Array.isArray(this._decodedAccessToken.resource_access.demoapp.roles)) {
-            const resultArr = this._decodedAccessToken.resource_access.demoapp.roles.map((r: string) => r.replace('ROLE_', ''));
-            observer.next(resultArr);
-          } else {
-            observer.next([this._decodedAccessToken.resource_access.demoapp.roles.replace('ROLE_', '')]);
-          }
-        }
-      });
+  // Liest Token aus sessionStorage und initialisiert User Subjects
+  loadUserFromStorage(): void {
+    const token = this.getToken();
+    if (!token) return;
+    const decoded = this.decodeJwt(token);
+    if (!decoded) return;
+    if (decoded.preferred_username) {
+      this.useraliasSubject.next(decoded.preferred_username);
     }
-    return of([]);
+    if (decoded.given_name && decoded.family_name) {
+      this.usernameSubject.next(`${decoded.given_name} ${decoded.family_name}`);
+    }
   }
 
-  public getIdentityClaims(): Record<string, any> {
-    return this.oauthService.getIdentityClaims();
+  getToken(): string | null {
+    return sessionStorage.getItem('access_token');
   }
 
-  public logout() {
-    this.oauthService.logOut();
-    this.useraliasSubject.next('');
-    this.usernameSubject.next('');
+  hasValidToken(): boolean {
+    const token = sessionStorage.getItem('access_token');
+    if (!token) return false;
+    const expiresAt = sessionStorage.getItem('expires_at');
+    if (!expiresAt) return false;
+    return Date.now() < Number(expiresAt);
   }
 
-  public login() {
+  hasRole(role: string): boolean {
+    const token = this.getToken();
+    if (!token) return false;
+    const decoded = this.decodeJwt(token);
+    const roles: string[] = decoded?.resource_access?.['gym-tracker-backend']?.roles ?? [];
+    return roles.includes(role) || roles.includes(role.replace('ROLE_', ''));
+  }
+
+  getRoles(): Observable<string[]> {
+    const token = this.getToken();
+    if (!token) return of([]);
+    const decoded = this.decodeJwt(token);
+    const roles: string[] = decoded?.resource_access?.['gym-tracker-backend']?.roles ?? [];
+    return new Observable(obs => { obs.next(roles); obs.complete(); });
+  }
+
+  getIdentityClaims(): Record<string, any> {
+    const token = this.getToken();
+    if (!token) return {};
+    return this.decodeJwt(token) ?? {};
+  }
+
+  login(): void {
     this.oauthService.initLoginFlow();
   }
 
-  private handleEvents(event: any) {
-    if (event instanceof OAuthErrorEvent) {
-      console.error(event);
-    } else {
-      this._accessToken = this.oauthService.getAccessToken();
-      this.accessTokenSubject.next(this._accessToken);
-      this._decodedAccessToken = this.jwtHelper.decodeToken(this._accessToken);
+  logout(): void {
+    sessionStorage.removeItem('access_token');
+    sessionStorage.removeItem('expires_at');
+    this.useraliasSubject.next('');
+    this.usernameSubject.next('');
+    this.oauthService.logOut();
+  }
 
-      if (this._decodedAccessToken?.family_name && this._decodedAccessToken?.given_name) {
-        const username = this._decodedAccessToken?.given_name + ' ' + this._decodedAccessToken?.family_name;
-        this.usernameSubject.next(username);
-      }
-
-      const claims = this.getIdentityClaims();
-      if (claims !== null) {
-        if (claims['preferred_username'] !== '') {
-          this.useraliasSubject.next(claims['preferred_username']);
-        }
-      }
+  private decodeJwt(token: string): any {
+    try {
+      const payload = token.split('.')[1];
+      const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+      return JSON.parse(atob(base64));
+    } catch {
+      return null;
     }
   }
 }

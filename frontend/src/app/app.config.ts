@@ -1,51 +1,41 @@
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi, withXsrfConfiguration } from '@angular/common/http';
-import { ApplicationConfig, enableProdMode, importProvidersFrom, inject, provideBrowserGlobalErrorListeners, provideEnvironmentInitializer, provideZonelessChangeDetection } from '@angular/core';
+import { APP_INITIALIZER, ApplicationConfig, importProvidersFrom, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { BrowserModule } from '@angular/platform-browser';
 import { provideTranslateService } from '@ngx-translate/core';
 import { AuthConfig, OAuthStorage, provideOAuthClient } from 'angular-oauth2-oidc';
 import { HttpXSRFInterceptor } from './interceptor/http.csrf.interceptor';
+import { HttpBearerInterceptor } from './interceptor/http.bearer.interceptor';
 import { AppAuthService } from './service/app.auth.service';
 import { environment } from '../environments/environment';
-import { provideTranslateHttpLoader, TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { MatPaginatorI18nService } from './service/mat.intl.service';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withViewTransitions } from '@angular/router';
 import { routes } from './app.routes';
-
-if (environment.production) {
-  enableProdMode();
-}
 
 export const authConfig: AuthConfig = {
   issuer: 'http://localhost:8080/realms/ILV',
   requireHttps: false,
-  redirectUri: environment.frontendBaseUrl,
+  redirectUri: 'http://localhost:4200/callback',
   postLogoutRedirectUri: environment.frontendBaseUrl,
-  clientId: 'demoapp',
-  scope: 'openid profile roles offline_access',
-  responseType: 'code',
+  clientId: 'gym-tracker-frontend',
+  scope: 'openid profile',
+  responseType: 'token',
   showDebugInformation: true,
-  requestAccessToken: true,
-  silentRefreshRedirectUri: window.location.origin + '/silent-refresh.html',
-  silentRefreshTimeout: 500,
-  clearHashAfterLogin: true,
-  waitForTokenInMsec: 1000
 };
 
 export function storageFactory(): OAuthStorage {
   return sessionStorage;
 }
 
-export function HttpLoaderFactory() {
-  return new TranslateHttpLoader();
-}
-
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
     provideBrowserGlobalErrorListeners(),
+    provideAnimations(),
     importProvidersFrom(
       BrowserModule,
       MatMomentDateModule,
@@ -55,16 +45,14 @@ export const appConfig: ApplicationConfig = {
       useClass: MatPaginatorI18nService,
     },
     { provide: AuthConfig, useValue: authConfig },
+    { provide: OAuthStorage, useFactory: storageFactory },
+    { provide: HTTP_INTERCEPTORS, useClass: HttpBearerInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: HttpXSRFInterceptor, multi: true },
-    {
-      provide: OAuthStorage,
-      useFactory: storageFactory,
-    },
     Location,
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     provideTranslateService({
       fallbackLang: 'en',
-      lang: 'en',
+      lang: 'de_CH',
       loader: provideTranslateHttpLoader({
         prefix: '/assets/i18n/',
         suffix: '.json'
@@ -77,8 +65,13 @@ export const appConfig: ApplicationConfig = {
         headerName: 'X-XSRF-TOKEN',
       })
     ),
-    provideOAuthClient({ resourceServer: { sendAccessToken: true, allowedUrls: [environment.backendBaseUrl], } }),
-    provideEnvironmentInitializer(() => { inject(AppAuthService).initAuth().finally() }),
-    provideRouter(routes)
+    provideOAuthClient(),
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (authService: AppAuthService) => () => authService.initAuth(),
+      deps: [AppAuthService],
+      multi: true,
+    },
+    provideRouter(routes, withComponentInputBinding(), withViewTransitions())
   ]
 };
