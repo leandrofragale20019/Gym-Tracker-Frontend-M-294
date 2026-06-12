@@ -1,0 +1,132 @@
+Projektübersicht - Frontend (für Mindmap)
+
+Zweck
+- Kurze Beschreibung, wo was im Projekt liegt und welche Rolle jede Datei/Ordner hat.
+- Ziel: Grundlage für eine Mindmap mit Hauptknoten und Unterknoten.
+
+Projekt-Root
+- angular.json: Angular-Workspace-Konfiguration (Projekte, Builds, Architect-Targets).
+- package.json: NPM-Skripte, Abhängigkeiten (devDependencies, dependencies), Start/Build/Test-Skripte.
+- proxy.conf.json: Entwicklungs-Proxy-Weiterleitung (z.B. API-Server während `ng serve`).
+- tsconfig.json / tsconfig.app.json / tsconfig.spec.json: TypeScript-Konfigurationen für das Projekt, App und Tests.
+- vitest.config.ts: Test-Runner/Konfiguration (Vitest) falls verwendet.
+
+src/
+- index.html: HTML-Einstiegspunkt (root `<app-root>`), Meta-Tags, Title.
+- main.ts: Bootstrapping der Angular-Anwendung (platformBrowserDynamic / bootstrapModule).
+- styles.scss: Globale Styles (Sass) für die gesamte App.
+- app.roles.ts: Zentrale Definitionen für Benutzerrollen (Enums/Arrays), wird in Guards/Directives verwendet.
+
+src/app/
+- app.component.ts / .html / .scss: Root-Komponente der App; enthält meist Header, Router-Outlet und Basis-Layouts.
+- app.config.ts: Globale Konfigurationskonstanten (z.B. App-Settings, Feature-Flags).
+- app.routes.ts: Routing-Konfiguration der Anwendung (Pfad → Komponente, Guard-Zuweisungen).
+
+src/app/components/
+- app-header/: Header-Komponente der Seite (Navigation, Logout, evtl. Sprache/Aktionen).
+- app-login/: Login-Formular / Authentifizierungs-UI.
+- base/: Basis-Komponente (wird von anderen Komponenten erweitert oder enthält Wiederverwendbares).
+- confirm-dialog/: Gemeinsamer Dialog für Bestätigungen (z.B. Löschen bestätigen).
+
+src/app/dataaccess/
+- department.ts, employee.ts, vehicle.ts, vehicleUsage.ts: Datenmodelle / Interfaces für Typisierung von API-Daten.
+
+src/app/dir/ (Directives)
+- autofocus-dir.ts: Directive, die ein Feld beim Rendern fokussiert.
+- is.in.role.dir.ts / is.in.roles.dir.ts: Direktiv-Logik, die UI-Elemente je nach Benutzerrolle ein-/ausblendet.
+
+src/app/guard/
+- app.auth.guard.ts: Routing-Guard, der prüft, ob ein Benutzer angemeldet ist / die erforderlichen Rollen hat; schützt Routen.
+
+src/app/interceptor/
+- http.csrf.interceptor.ts: HTTP-Interceptor, der z.B. CSRF-Token anfragt oder HTTP-Header zu allen Requests hinzufügt.
+
+src/app/pages/
+- dashboard/: Übersicht / Startseite nach Login.
+- department-detail/, department-list/: CRUD-Ansichten für Departments (Detail- und Listenansicht).
+- employee-detail/, employee-list/: CRUD für Employees.
+- vehicle-detail/, vehicle-list/: CRUD für Vehicles.
+- vehicle-usage-detail/, vehicle-usage-list/: Views zum Verwalten und Anzeigen von Fahrzeugnutzungen.
+- no-access/: Seite, die angezeigt wird, wenn der Benutzer keine Berechtigung hat.
+
+src/app/service/
+- app.auth.service.ts: Authentifizierungs-Logik (Login, Logout, Token-Verwaltung, aktuelle User-Daten).
+- department.service.ts, employee.service.ts, vehicle.service.ts, vehicle-usage.service.ts: Services, die API-Aufrufe durchführen für CRUD-Operationen.
+- header.service.ts: Service für Header-bezogene Funktionen (z.B. Titel setzen, Benachrichtigungen).
+- mat.intl.service.ts: Material-Internationalisierungs-Adapter (z.B. Datum/Locale für Angular Material).
+- *.spec.ts: Unit-Tests für die jeweiligen Services/Komponenten (Vitest / Karma / Jest je nach Setup).
+
+src/assets/
+- fonts/: Eigene Schriftarten.
+- i18n/: Übersetzungsdateien (z.B. de_CH.json, en.json) für Internationalisierung (ngx-translate oder Angular i18n).
+
+src/environments/
+- environment.ts: Entwicklungs-Umgebungsvariablen (API-URLs, Flags).
+- environment.prod.ts: Produktionskonfigurationen; werden beim Build ersetzt.
+
+Allgemeine Architekturhinweise
+- Komponenten sind die UI-Einheiten (kleinste wiederverwendbare Bausteine).
+- Pages sind zusammengesetzte Views, oft als Routenziele genutzt.
+- Services kapseln Geschäftslogik und API-Kommunikation; injectbar via DI.
+- Guards/Interceptors sind Cross-Cutting Concerns (Sicherheit, Request-Manipulation).
+- Directives verändern Verhalten oder Darstellung von DOM-Elementen.
+- Datenmodelle (`dataaccess`) definieren Typen/Interfaces und erleichtern Typsicherheit.
+
+Testdateien
+- `*.spec.ts` neben Komponenten/Services: Unit-Tests; decken oft Logik, Komponenten-Rendering und Services ab.
+
+Skripte/Entwicklung
+- `npm run start` / `ng serve`: Startet Dev-Server (sollte in `package.json` stehen).
+- `npm run build` / `ng build`: Produktions-Build.
+- `npm test` / `vitest` / `ng test`: Runs Test Suite.
+
+Tipps für die Mindmap (Strukturvorschlag)
+- Wurzel: Frontend (Projektname)
+  - Config
+    - angular.json
+    - package.json
+    - tsconfig*
+    - proxy.conf.json
+  - Source
+    - main.ts
+    - index.html
+    - styles.scss
+    - app
+      - Root: app.component
+      - Config: app.config.ts, app.routes.ts, app.roles.ts
+      - Components
+        - app-header
+        - app-login
+        - confirm-dialog
+      - Pages
+        - dashboard
+        - department-list / detail
+        - employee-list / detail
+        - vehicle-list / detail
+        - vehicle-usage-list / detail
+      - Services
+        - auth, department, employee, vehicle, vehicle-usage, header
+      - Guards / Interceptors
+      - Directives
+      - Data Models
+  - Assets
+    - fonts
+    - i18n
+  - Environments
+    - environment.ts
+    - environment.prod.ts
+  - Tests
+    - *.spec.ts (neben relevanten Dateien)
+
+Wie du die Mindmap erzeugen kannst
+- Erzeuge Hauptknoten gemäß dem Vorschlag "Config / Source / Assets / Environments / Tests".
+- Unter `Source` erstelle `App` als Knoten und gliedere dann Komponenten, Pages, Services, Guards, Directives, Data Models.
+- Verwende für Komponenten und Services kurze Labels (z.B. "Component: app-header - Navigation/Logout").
+- Verknüpfe Guards mit den Routes aus `app.routes.ts` als Referenz.
+
+Anmerkungen / nützliches Vorgehen
+- Öffne `src/app/app.routes.ts` um die tatsächlichen Routen und zugeordnete Komponenten zu sehen; das hilft, die Mindmap-Äste der Pages exakt zu benennen.
+- Öffne `src/app/service/*.ts` um die verfügbaren API-Operationen zu sehen (CRUD-Methoden → Unterknoten in Mindmap).
+- Übersetzungsdateien in `assets/i18n` können als Unterpunkt zu „Assets → i18n“ mit Sprachknoten hinzugefügt werden.
+
+Wenn du möchtest, kann ich die Mindmap auch direkt in einem Format exportieren (z.B. FreeMind .mm oder als JSON für ein Mindmap-Tool). Sag mir kurz welches Format du bevorzugst.
