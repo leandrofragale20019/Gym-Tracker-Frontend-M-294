@@ -1,43 +1,99 @@
 .dashboard-page {
-  h1 {
-    font-size: 26px;
-    color: #333;
+  .dashboard-header {
     margin-bottom: 32px;
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0 0 4px;
+
+      .username { color: var(--primary); }
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 0;
+    }
   }
 }
 
 .widget-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 20px;
 }
 
 .widget {
-  background: white;
-  border-radius: 8px;
-  padding: 28px 24px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  border-top: 4px solid #1976d2;
+  border-top: 3px solid transparent;
+  transition: transform var(--transition), box-shadow var(--transition);
 
-  .widget-icon { font-size: 36px; margin-bottom: 12px; }
-  h2 { font-size: 18px; color: #333; margin: 0 0 8px; }
-  .widget-stat { color: #666; font-size: 14px; margin: 0 0 20px; flex: 1; }
+  &:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+
+  &--plans    { border-top-color: var(--primary); }
+  &--exercises { border-top-color: #7C3AED; }
+  &--trainers  { border-top-color: #0891B2; }
+  &--members   { border-top-color: #D97706; }
 }
 
-.widget-admin { border-top-color: #f57c00; }
+.widget-top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.widget-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon { font-size: 26px; width: 26px; height: 26px; line-height: 26px; }
+
+  .widget--plans &    { background: var(--primary-light); color: var(--primary); }
+  .widget--exercises & { background: #F3F0FF; color: #7C3AED; }
+  .widget--trainers &  { background: #E0F7FA; color: #0891B2; }
+  .widget--members &   { background: #FFFBEB; color: #D97706; }
+}
+
+.widget-meta {
+  display: flex;
+  flex-direction: column;
+
+  .widget-stat  { font-size: 32px; font-weight: 700; color: var(--text); line-height: 1; }
+  .widget-label { font-size: 14px; font-weight: 600; color: var(--text); margin-top: 3px; }
+}
+
+.widget-desc {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 20px;
+  flex: 1;
+}
 
 .btn-widget {
-  display: inline-block;
-  background: #1976d2;
-  color: white;
-  padding: 8px 20px;
-  border-radius: 4px;
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  background: var(--primary-light);
+  color: var(--primary);
+  padding: 7px 16px;
+  border-radius: var(--radius-sm);
   text-decoration: none;
-  font-size: 14px;
-  transition: background 0.15s;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all var(--transition);
 
-  &:hover { background: #1565c0; }
+  &:hover { background: var(--primary); color: white; }
 }

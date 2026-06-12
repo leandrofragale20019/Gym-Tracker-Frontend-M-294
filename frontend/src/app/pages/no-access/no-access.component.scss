@@ -7,24 +7,47 @@
 
 .no-access-card {
   text-align: center;
-  padding: 48px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 56px 48px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  max-width: 420px;
+  width: 100%;
 
-  .icon { font-size: 64px; margin-bottom: 16px; }
-  h2 { font-size: 24px; color: #d32f2f; margin-bottom: 8px; }
-  p { color: #666; margin-bottom: 24px; }
+  .icon {
+    font-size: 56px;
+    margin-bottom: 20px;
+    line-height: 1;
+    filter: grayscale(0.2);
+  }
+
+  h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--danger);
+    margin: 0 0 10px;
+  }
+
+  p {
+    color: var(--muted);
+    margin: 0 0 28px;
+    font-size: 15px;
+    line-height: 1.6;
+  }
 }
 
 .btn-back {
-  display: inline-block;
-  background: #1976d2;
+  display: inline-flex;
+  align-items: center;
+  background: var(--primary);
   color: white;
-  padding: 10px 24px;
-  border-radius: 4px;
+  padding: 11px 28px;
+  border-radius: var(--radius-sm);
   text-decoration: none;
-  font-size: 15px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background var(--transition), transform var(--transition);
 
-  &:hover { background: #1565c0; }
+  &:hover { background: var(--primary-dark); transform: translateY(-1px); }
+  &:active { transform: translateY(0); }
 }

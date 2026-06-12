@@ -48,10 +48,10 @@
             @for (ex of plan.exercises; track $index; let i = $index) {
               <tr>
                 <td>
-                  <select [value]="ex.exerciseId" (change)="updateExerciseField(i, 'exerciseId', $any($event.target).value)">
-                    <option [value]="0" disabled>Auswählen...</option>
+                  <select [(ngModel)]="plan.exercises[i].exerciseId" [name]="'exercise-' + i">
+                    <option [ngValue]="0" disabled>Auswählen...</option>
                     @for (e of availableExercises; track e.id) {
-                      <option [value]="e.id">{{ e.name }}</option>
+                      <option [ngValue]="e.id">{{ e.name }}</option>
                     }
                   </select>
                 </td>

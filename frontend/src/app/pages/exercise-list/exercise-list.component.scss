@@ -2,12 +2,12 @@
   .page-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
     margin-bottom: 24px;
     flex-wrap: wrap;
     gap: 16px;
 
-    h1 { margin: 0; font-size: 24px; color: #333; }
+    h1 { margin: 0; font-size: 24px; font-weight: 700; color: var(--text); }
   }
 
   .header-controls {
@@ -19,47 +19,61 @@
 
   .search-filter {
     display: flex;
-    gap: 16px;
+    gap: 12px;
     flex-wrap: wrap;
 
     label {
       display: flex;
       flex-direction: column;
-      font-size: 13px;
-      font-weight: 500;
-      gap: 4px;
-      color: #555;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
 
       input, select {
-        padding: 7px 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
+        padding: 9px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius-sm);
         font-size: 14px;
-        &:focus { outline: none; border-color: #1976d2; }
+        color: var(--text);
+        background: var(--surface);
+        min-width: 160px;
+        transition: border-color var(--transition), box-shadow var(--transition);
+
+        &:focus {
+          outline: none;
+          border-color: var(--primary);
+          box-shadow: 0 0 0 3px var(--primary-light);
+        }
       }
     }
   }
 
   .exercise-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 16px;
   }
 
   .exercise-card {
-    background: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition), box-shadow var(--transition);
+
+    &:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
 
     .card-body {
       flex: 1;
-      h3 { margin: 0 0 6px; font-size: 15px; color: #333; }
-      p { margin: 8px 0 0; font-size: 13px; color: #666; }
+      h3 { margin: 0 0 8px; font-size: 15px; font-weight: 600; color: var(--text); }
+      p { margin: 8px 0 0; font-size: 13px; color: var(--muted); line-height: 1.5; }
     }
 
     .card-actions { display: flex; gap: 8px; }
@@ -67,10 +81,14 @@
 
   .badge {
     display: inline-block;
-    background: #e3f2fd;
-    color: #1565c0;
-    font-size: 12px;
-    padding: 2px 8px;
-    border-radius: 12px;
+    background: #EBF8FF;
+    color: #2B6CB0;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid #BEE3F8;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
   }
 }

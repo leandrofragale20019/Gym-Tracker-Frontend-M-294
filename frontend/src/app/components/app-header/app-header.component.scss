@@ -1,44 +1,55 @@
 .app-header {
   display: flex;
   align-items: center;
-  gap: 24px;
-  padding: 0 24px;
-  height: 60px;
-  background: #1976d2;
+  gap: 32px;
+  padding: 0 32px;
+  height: 64px;
+  background: var(--primary);
   color: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 12px rgba(59, 89, 152, 0.4);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .header-brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   min-width: 160px;
+  cursor: default;
+  user-select: none;
 
-  .header-logo { font-size: 24px; }
+  .header-logo { height: 36px; width: auto; }
 
   .header-title {
-    font-size: 20px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    color: white;
   }
 }
 
 .header-nav {
   display: flex;
-  gap: 4px;
   flex: 1;
+  height: 100%;
 
   a {
-    color: rgba(255,255,255,0.85);
+    display: flex;
+    align-items: center;
+    color: rgba(255,255,255,0.72);
     text-decoration: none;
-    padding: 6px 16px;
-    border-radius: 4px;
-    font-size: 15px;
-    transition: background 0.15s, color 0.15s;
+    padding: 0 14px;
+    font-size: 14px;
+    font-weight: 500;
+    height: 100%;
+    border-bottom: 3px solid transparent;
+    border-top: 3px solid transparent;
+    transition: color var(--transition), border-bottom-color var(--transition);
 
-    &:hover { background: rgba(255,255,255,0.15); color: white; }
-    &.active { background: rgba(255,255,255,0.2); color: white; font-weight: 500; }
+    &:hover { color: white; border-bottom-color: rgba(255,255,255,0.45); }
+    &.active { color: white; border-bottom-color: white; }
   }
 }
 
@@ -48,18 +59,29 @@
   gap: 12px;
   margin-left: auto;
 
-  .user-info { font-size: 14px; opacity: 0.9; }
+  .user-info {
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+    background: rgba(255,255,255,0.12);
+    padding: 5px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
 }
 
 .btn-logout {
-  background: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.1);
   color: white;
-  border: 1px solid rgba(255,255,255,0.4);
-  padding: 6px 14px;
-  border-radius: 4px;
+  border: 1.5px solid rgba(255,255,255,0.28);
+  padding: 6px 16px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 14px;
-  transition: background 0.15s;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all var(--transition);
 
-  &:hover { background: rgba(255,255,255,0.25); }
+  &:hover {
+    background: rgba(255,255,255,0.22);
+    border-color: rgba(255,255,255,0.55);
+  }
 }

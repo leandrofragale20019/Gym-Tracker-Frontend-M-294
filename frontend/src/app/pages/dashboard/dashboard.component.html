@@ -1,35 +1,56 @@
 <div class="dashboard-page">
-  <h1>Willkommen zurück, {{ userName }}</h1>
+  <div class="dashboard-header">
+    <h1>Willkommen zurück, <span class="username">{{ userName }}</span></h1>
+    <p class="subtitle">Übersicht Ihrer Gym-Aktivitäten</p>
+  </div>
 
   <div class="widget-grid">
-    <div class="widget">
-      <div class="widget-icon">📋</div>
-      <h2>Meine Pläne</h2>
-      <p class="widget-stat">{{ myPlanCount }} Trainingspläne aktiv</p>
+    <div class="widget widget--plans">
+      <div class="widget-top">
+        <div class="widget-icon"><mat-icon>fitness_center</mat-icon></div>
+        <div class="widget-meta">
+          <span class="widget-stat">{{ myPlanCount }}</span>
+          <span class="widget-label">Trainingspläne</span>
+        </div>
+      </div>
+      <p class="widget-desc">Aktive Pläne</p>
       <a routerLink="/workout-plans" class="btn-widget">Ansehen</a>
     </div>
 
-    <div class="widget">
-      <div class="widget-icon">💪</div>
-      <h2>Übungskatalog</h2>
-      <p class="widget-stat">
-        {{ exerciseCount }} Übungen in {{ muscleGroupCount }} Muskelgruppen
-      </p>
+    <div class="widget widget--exercises">
+      <div class="widget-top">
+        <div class="widget-icon"><mat-icon>menu_book</mat-icon></div>
+        <div class="widget-meta">
+          <span class="widget-stat">{{ exerciseCount }}</span>
+          <span class="widget-label">Übungskatalog</span>
+        </div>
+      </div>
+      <p class="widget-desc">{{ muscleGroupCount }} Muskelgruppen</p>
       <a routerLink="/exercises" class="btn-widget">Öffnen</a>
     </div>
 
-    <div class="widget">
-      <div class="widget-icon">🧑‍🏫</div>
-      <h2>Trainer</h2>
-      <p class="widget-stat">Trainer verwalten</p>
+    <div class="widget widget--trainers">
+      <div class="widget-top">
+        <div class="widget-icon"><mat-icon>sports</mat-icon></div>
+        <div class="widget-meta">
+          <span class="widget-stat">{{ trainerCount() }}</span>
+          <span class="widget-label">Trainer</span>
+        </div>
+      </div>
+      <p class="widget-desc">Trainer verwalten</p>
       <a routerLink="/trainers" class="btn-widget">Öffnen</a>
     </div>
 
     @if (isAdmin) {
-      <div class="widget widget-admin">
-        <div class="widget-icon">👥</div>
-        <h2>Mitglieder</h2>
-        <p class="widget-stat">{{ memberCount }} Mitglieder registriert</p>
+      <div class="widget widget--members">
+        <div class="widget-top">
+          <div class="widget-icon"><mat-icon>group</mat-icon></div>
+          <div class="widget-meta">
+            <span class="widget-stat">{{ memberCount }}</span>
+            <span class="widget-label">Mitglieder</span>
+          </div>
+        </div>
+        <p class="widget-desc">Registrierte Mitglieder</p>
         <a routerLink="/members" class="btn-widget">Verwalten</a>
       </div>
     }

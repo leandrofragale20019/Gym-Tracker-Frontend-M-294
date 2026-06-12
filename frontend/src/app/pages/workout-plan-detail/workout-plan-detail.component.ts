@@ -74,9 +74,9 @@ export class WorkoutPlanDetailComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  updateExerciseField(index: number, field: keyof WorkoutPlanExercise, value: any): void {
+  updateExerciseField(index: number, field: 'sets' | 'repetitions', value: string): void {
     const updated = [...this.plan.exercises];
-    updated[index] = { ...updated[index], [field]: field === 'exerciseId' || field === 'sets' || field === 'repetitions' ? +value : value };
+    updated[index] = { ...updated[index], [field]: +value };
     this.plan.exercises = updated;
   }
 
