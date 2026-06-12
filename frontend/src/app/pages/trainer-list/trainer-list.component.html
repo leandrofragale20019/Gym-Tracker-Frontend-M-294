@@ -1,0 +1,84 @@
+<div class="trainer-list-page">
+  <div class="page-header">
+    <h1>Trainer</h1>
+    <div class="header-controls">
+      <input
+        type="text"
+        class="search-input"
+        [value]="searchTerm()"
+        (input)="searchTerm.set($any($event.target).value)"
+        placeholder="Trainer suchen..."
+      />
+      @if (isAdmin()) {
+        <button class="btn-primary" (click)="openCreate()">+ Neuer Trainer</button>
+      }
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <p class="error">{{ errorMessage() }}</p>
+  }
+
+  <div class="page-layout">
+    <div class="trainer-grid">
+      @for (trainer of filteredTrainers(); track trainer.id) {
+        <div class="trainer-card">
+          <div class="card-body">
+            <div class="trainer-avatar">{{ trainer.firstName[0] }}{{ trainer.lastName[0] }}</div>
+            <div class="trainer-info">
+              <h3>{{ trainer.firstName }} {{ trainer.lastName }}</h3>
+              <span class="badge">{{ trainer.specialization }}</span>
+            </div>
+          </div>
+          @if (isAdmin()) {
+            <div class="card-actions">
+              <button (click)="openEdit(trainer)" class="btn-small">Bearbeiten</button>
+              <button (click)="delete(trainer)" class="btn-small btn-danger">Löschen</button>
+            </div>
+          }
+        </div>
+      } @empty {
+        @if (!errorMessage()) {
+          <p class="empty">Keine Trainer gefunden.</p>
+        }
+      }
+    </div>
+
+    @if (showForm()) {
+      <div class="form-section">
+        <div class="form-card">
+          <h3>{{ isEditMode() ? 'Trainer bearbeiten' : 'Trainer erfassen' }}</h3>
+
+          <div class="form-group">
+            <label for="trainer-firstName">Vorname *</label>
+            <input id="trainer-firstName" type="text" [value]="formData().firstName" (input)="updateField('firstName', $any($event.target).value)" placeholder="Vorname" />
+            @if (errors()['firstName']) {
+              <span class="error-text">{{ errors()['firstName'] }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="trainer-lastName">Nachname *</label>
+            <input id="trainer-lastName" type="text" [value]="formData().lastName" (input)="updateField('lastName', $any($event.target).value)" placeholder="Nachname" />
+            @if (errors()['lastName']) {
+              <span class="error-text">{{ errors()['lastName'] }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="trainer-specialization">Spezialisierung *</label>
+            <input id="trainer-specialization" type="text" [value]="formData().specialization" (input)="updateField('specialization', $any($event.target).value)" placeholder="z.B. Kraft & Kondition" />
+            @if (errors()['specialization']) {
+              <span class="error-text">{{ errors()['specialization'] }}</span>
+            }
+          </div>
+
+          <div class="form-actions">
+            <button (click)="cancel()" class="btn-secondary">Abbrechen</button>
+            <button (click)="save()" class="btn-primary" [disabled]="hasErrors()">Speichern</button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

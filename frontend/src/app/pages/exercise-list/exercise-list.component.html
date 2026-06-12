@@ -1,0 +1,51 @@
+<div class="exercise-list-page">
+  <div class="page-header">
+    <h1>Übungskatalog</h1>
+    <div class="header-controls">
+      <div class="search-filter">
+        <label>
+          Suchen:
+          <input type="text" [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)" placeholder="Übungsname..." />
+        </label>
+        <label>
+          Muskelgruppe:
+          <select [value]="filterMuscleGroup()" (change)="filterMuscleGroup.set($any($event.target).value)">
+            <option value="">Alle</option>
+            @for (mg of muscleGroups(); track mg) {
+              <option [value]="mg">{{ mg }}</option>
+            }
+          </select>
+        </label>
+      </div>
+      @if (isAdmin()) {
+        <a routerLink="/exercises/new" class="btn-primary">+ Neue Übung</a>
+      }
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <p class="error">{{ errorMessage() }}</p>
+  }
+
+  <div class="exercise-grid">
+    @for (exercise of filteredExercises(); track exercise.id) {
+      <div class="exercise-card">
+        <div class="card-body">
+          <h3>{{ exercise.name }}</h3>
+          <span class="badge">{{ exercise.muscleGroup }}</span>
+          <p>{{ exercise.description }}</p>
+        </div>
+        @if (isAdmin()) {
+          <div class="card-actions">
+            <a [routerLink]="['/exercises', exercise.id]" class="btn-small">Bearbeiten</a>
+            <button (click)="delete(exercise)" class="btn-small btn-danger">Löschen</button>
+          </div>
+        }
+      </div>
+    } @empty {
+      @if (!errorMessage()) {
+        <p class="empty">Keine Übungen gefunden.</p>
+      }
+    }
+  </div>
+</div>

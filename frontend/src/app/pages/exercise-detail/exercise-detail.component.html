@@ -1,0 +1,38 @@
+<div class="detail-page">
+  <div class="form-card">
+    <h2>Übung {{ isEditMode ? 'bearbeiten' : 'erstellen' }}</h2>
+
+    @if (errorMessage) {
+      <p class="error">{{ errorMessage }}</p>
+    }
+
+    <div class="form-group">
+      <label for="exercise-name">Name der Übung *</label>
+      <input id="exercise-name" type="text" [(ngModel)]="exercise.name" placeholder="z.B. Kniebeuge" />
+      @if (errors()['name']) {
+        <span class="error-text">{{ errors()['name'] }}</span>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="exercise-muscleGroup">Muskelgruppe *</label>
+      <input id="exercise-muscleGroup" type="text" [(ngModel)]="exercise.muscleGroup" placeholder="z.B. Beine" />
+      @if (errors()['muscleGroup']) {
+        <span class="error-text">{{ errors()['muscleGroup'] }}</span>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="exercise-description">Beschreibung</label>
+      <textarea id="exercise-description" [(ngModel)]="exercise.description" rows="4" placeholder="Übungsbeschreibung..."></textarea>
+      @if (errors()['description']) {
+        <span class="error-text">{{ errors()['description'] }}</span>
+      }
+    </div>
+
+    <div class="form-actions">
+      <button type="button" (click)="cancel()" class="btn-secondary">Abbrechen</button>
+      <button type="button" (click)="save()" class="btn-primary" [disabled]="hasErrors()">Speichern</button>
+    </div>
+  </div>
+</div>

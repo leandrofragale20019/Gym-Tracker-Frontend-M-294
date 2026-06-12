@@ -1,0 +1,83 @@
+<div class="member-list-page">
+  <div class="page-header">
+    <h1>Mitgliederverwaltung</h1>
+    @if (!showForm()) {
+      <button class="btn-primary" (click)="openCreate()">+ Neues Mitglied</button>
+    }
+  </div>
+
+  @if (errorMessage()) {
+    <p class="error">{{ errorMessage() }}</p>
+  }
+
+  <div class="page-layout">
+    <div class="table-section">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Beitrittsdatum</th>
+            <th>Aktionen</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (member of members(); track member.id) {
+            <tr>
+              <td>{{ member.id }}</td>
+              <td>{{ member.firstName }} {{ member.lastName }}</td>
+              <td>{{ member.email }}</td>
+              <td>{{ member.joinDate ?? '—' }}</td>
+              <td class="actions">
+                <button (click)="openEdit(member)" class="btn-small">Bearbeiten</button>
+                <button (click)="delete(member)" class="btn-small btn-danger">Löschen</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty">Keine Mitglieder vorhanden.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (showForm()) {
+      <div class="form-section">
+        <div class="form-card">
+          <h3>{{ isEditMode() ? 'Mitglied bearbeiten' : 'Mitglied erfassen' }}</h3>
+
+          <div class="form-group">
+            <label for="member-firstName">Vorname *</label>
+            <input id="member-firstName" type="text" [value]="formData().firstName" (input)="updateField('firstName', $any($event.target).value)" />
+            @if (errors()['firstName']) {
+              <span class="error-text">{{ errors()['firstName'] }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="member-lastName">Nachname *</label>
+            <input id="member-lastName" type="text" [value]="formData().lastName" (input)="updateField('lastName', $any($event.target).value)" />
+            @if (errors()['lastName']) {
+              <span class="error-text">{{ errors()['lastName'] }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="member-email">Email *</label>
+            <input id="member-email" type="email" [value]="formData().email" (input)="updateField('email', $any($event.target).value)" />
+            @if (errors()['email']) {
+              <span class="error-text">{{ errors()['email'] }}</span>
+            }
+          </div>
+
+          <div class="form-actions">
+            <button (click)="cancel()" class="btn-secondary">Abbrechen</button>
+            <button (click)="save()" class="btn-primary" [disabled]="hasErrors()">Speichern</button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

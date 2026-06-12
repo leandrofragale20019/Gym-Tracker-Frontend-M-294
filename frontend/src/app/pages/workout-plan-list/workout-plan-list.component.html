@@ -1,0 +1,82 @@
+<div class="plan-list-page">
+  <div class="page-header">
+    <h1>Trainingspläne</h1>
+    @if (isAdmin()) {
+      <a routerLink="/workout-plans/new" class="btn-primary">+ Neuer Plan</a>
+    }
+  </div>
+
+  @if (errorMessage()) {
+    <p class="error">{{ errorMessage() }}</p>
+  }
+
+  <div class="plan-layout">
+    <div class="table-section">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Titel</th>
+            @if (isAdmin()) {
+              <th>Mitglied</th>
+            }
+            <th>Aktionen</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (plan of plans(); track plan.id) {
+            <tr [class.selected]="selectedPlanId() === plan.id">
+              <td>
+                <input type="radio" [checked]="selectedPlanId() === plan.id" (change)="select(plan.id!)" />
+              </td>
+              <td>{{ plan.title }}</td>
+              @if (isAdmin()) {
+                <td>{{ plan.memberName ?? '—' }}</td>
+              }
+              <td class="actions">
+                <button (click)="select(plan.id!)" class="btn-small">Auswählen</button>
+                @if (isAdmin()) {
+                  <a [routerLink]="['/workout-plans', plan.id]" class="btn-small">Bearbeiten</a>
+                  <button (click)="delete(plan)" class="btn-small btn-danger">Löschen</button>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td [attr.colspan]="isAdmin() ? 4 : 3" class="empty">Keine Trainingspläne vorhanden.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (selectedPlan(); as plan) {
+      <div class="detail-section">
+        <h2>{{ plan.title }}</h2>
+        @if (isAdmin() && plan.memberName) {
+          <span class="member-badge">{{ plan.memberName }}</span>
+        }
+        <table class="exercise-table">
+          <thead>
+            <tr>
+              <th>Übung</th>
+              <th>Sätze</th>
+              <th>Wiederholungen</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (ex of plan.exercises; track ex.exerciseId) {
+              <tr>
+                <td>{{ ex.exerciseName ?? 'Übung ' + ex.exerciseId }}</td>
+                <td>{{ ex.sets }}</td>
+                <td>{{ ex.repetitions }}</td>
+              </tr>
+            } @empty {
+              <tr><td colspan="3" class="empty">Keine Übungen in diesem Plan.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

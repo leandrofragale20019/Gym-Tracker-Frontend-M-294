@@ -1,0 +1,81 @@
+<div class="detail-page">
+  <div class="form-card">
+    <h2>{{ isEditMode ? 'Trainingsplan bearbeiten' : 'Neuer Trainingsplan' }}</h2>
+
+    @if (errorMessage) {
+      <p class="error">{{ errorMessage }}</p>
+    }
+
+    <div class="form-group">
+      <label for="plan-title">Titel *</label>
+      <input id="plan-title" type="text" [(ngModel)]="plan.title" placeholder="Plan-Titel..." />
+      @if (errors()['title']) {
+        <span class="error-text">{{ errors()['title'] }}</span>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="plan-member">Mitglied</label>
+      <select id="plan-member" [(ngModel)]="plan.memberId">
+        <option [value]="0" disabled>Mitglied auswählen...</option>
+        @for (m of members; track m.id) {
+          <option [value]="m.id">{{ m.firstName }} {{ m.lastName }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="exercises-section">
+      <div class="exercises-header">
+        <h3>Übungen</h3>
+        <button type="button" (click)="addExercise()" class="btn-small">+ Übung hinzufügen</button>
+      </div>
+
+      @if (errors()['exercises']) {
+        <span class="error-text">{{ errors()['exercises'] }}</span>
+      }
+
+      @if (plan.exercises.length > 0) {
+        <table>
+          <thead>
+            <tr>
+              <th>Übung</th>
+              <th>Sätze</th>
+              <th>Wiederholungen</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (ex of plan.exercises; track $index; let i = $index) {
+              <tr>
+                <td>
+                  <select [value]="ex.exerciseId" (change)="updateExerciseField(i, 'exerciseId', $any($event.target).value)">
+                    <option [value]="0" disabled>Auswählen...</option>
+                    @for (e of availableExercises; track e.id) {
+                      <option [value]="e.id">{{ e.name }}</option>
+                    }
+                  </select>
+                </td>
+                <td>
+                  <input type="number" [value]="ex.sets" (input)="updateExerciseField(i, 'sets', $any($event.target).value)" min="1" />
+                </td>
+                <td>
+                  <input type="number" [value]="ex.repetitions" (input)="updateExerciseField(i, 'repetitions', $any($event.target).value)" min="1" />
+                </td>
+                <td>
+                  <button type="button" (click)="removeExercise(i)" class="btn-small btn-danger">✕</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <p class="empty">Noch keine Übungen hinzugefügt.</p>
+      }
+    </div>
+
+    <div class="form-actions">
+      <button type="button" (click)="cancel()" class="btn-secondary">Abbrechen</button>
+      <button type="button" (click)="save()" class="btn-primary" [disabled]="hasErrors()">Speichern</button>
+    </div>
+  </div>
+</div>
