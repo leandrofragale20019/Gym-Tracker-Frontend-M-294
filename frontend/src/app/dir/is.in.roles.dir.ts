@@ -1,39 +1,28 @@
-import { Directive, inject, Input, OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
+import { Directive, Input, OnDestroy, OnInit, TemplateRef, ViewContainerRef, inject } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AppAuthService } from '../service/app.auth.service';
 
-@Directive({ selector: '[appIsInRoles]' })
+@Directive({
+  selector: '[appIsInRoles]',
+  standalone: true
+})
 export class IsInRolesDirective implements OnInit, OnDestroy {
   @Input() appIsInRoles?: string[];
-  stop$ = new Subject();
-  isVisible = false;
 
   private viewContainerRef = inject(ViewContainerRef);
-  private templateRef = inject(TemplateRef<any>);
+  private templateRef = inject<TemplateRef<any>>(TemplateRef);
   private authService = inject(AppAuthService);
-
-  constructor() { }
+  private stop$ = new Subject<void>();
+  private isVisible = false;
 
   ngOnInit() {
-    this.authService.getRoles().pipe(
-      takeUntil(this.stop$)
-    ).subscribe(roles => {
-      if (!roles) {
-        this.viewContainerRef.clear();
-      }
-      let found = true;
-      this.appIsInRoles?.forEach(r => {
-        if (!roles.includes(r)) {
-          found = false;
-        }
-      });
-      if (found) {
-        if (!this.isVisible) {
-          this.isVisible = true;
-          this.viewContainerRef.createEmbeddedView(this.templateRef);
-        }
-      } else {
+    this.authService.getRoles().pipe(takeUntil(this.stop$)).subscribe(roles => {
+      const hasAll = (this.appIsInRoles ?? []).every(r => roles.includes(r));
+      if (hasAll && !this.isVisible) {
+        this.isVisible = true;
+        this.viewContainerRef.createEmbeddedView(this.templateRef);
+      } else if (!hasAll) {
         this.isVisible = false;
         this.viewContainerRef.clear();
       }
@@ -41,6 +30,7 @@ export class IsInRolesDirective implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.stop$.next(null);
+    this.stop$.next();
+    this.stop$.complete();
   }
 }

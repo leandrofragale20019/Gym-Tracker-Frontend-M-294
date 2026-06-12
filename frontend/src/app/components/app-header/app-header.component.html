@@ -1,7 +1,23 @@
-<span style="font-weight: bold; position: absolute; height: 48px; line-height: 48px;">
-  M294 Demo App @if (currentPage !== '') {
-  <span
-  style="color: red;font-weight: bold">- {{currentPage | translate}}</span>
-}
-</span>
+<header class="app-header">
+  <div class="header-brand">
+    <span class="header-logo">🏋️</span>
+    <span class="header-title">Gym Tracker</span>
+  </div>
 
+  @if (isLoggedIn()) {
+    <nav class="header-nav">
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/exercises" routerLinkActive="active">Übungen</a>
+      <a routerLink="/trainers" routerLinkActive="active">Trainer</a>
+      <a routerLink="/workout-plans" routerLinkActive="active">Trainingspläne</a>
+      @if (isAdmin()) {
+        <a routerLink="/members" routerLinkActive="active">Mitglieder</a>
+      }
+    </nav>
+
+    <div class="header-user">
+      <span class="user-info">{{ username() }} | {{ roleLabel }}</span>
+      <button class="btn-logout" (click)="logout()">Abmelden</button>
+    </div>
+  }
+</header>

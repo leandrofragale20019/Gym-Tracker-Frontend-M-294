@@ -1,9 +1,10 @@
-<div>
-  {{ 'main.login' | translate}}
-</div>
-<div style="margin-top: 20px">
-  <button (click)="login()" color="warn" mat-button>
-    <mat-icon>login</mat-icon>
-    {{ 'nav.login' | translate }}
-  </button>
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-logo">🏋️</div>
+    <h1>Gym Tracker</h1>
+    <p>Bitte melden Sie sich an, um die Applikation zu verwenden.</p>
+    <button class="btn-keycloak" (click)="login()">
+      Mit Keycloak anmelden
+    </button>
+  </div>
 </div>

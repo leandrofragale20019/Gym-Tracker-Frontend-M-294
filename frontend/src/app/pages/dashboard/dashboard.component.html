@@ -1,11 +1,37 @@
-@if (useralias !== '') {
-  <div style="font-weight: bold">
-    {{ 'dashboard.welcome' | translate:{username: username, useralias: useralias} }}
-  <!--div [innerHTML]="'dashboard.welcome' | translate: {username: username, useralias: useralias}"></div-->
-</div>
-}
-@if (!useralias || useralias === '') {
-  <div>
-    <app-login></app-login>
+<div class="dashboard-page">
+  <h1>Willkommen zurück, {{ userName }}</h1>
+
+  <div class="widget-grid">
+    <div class="widget">
+      <div class="widget-icon">📋</div>
+      <h2>Meine Pläne</h2>
+      <p class="widget-stat">{{ myPlanCount }} Trainingspläne aktiv</p>
+      <a routerLink="/workout-plans" class="btn-widget">Ansehen</a>
+    </div>
+
+    <div class="widget">
+      <div class="widget-icon">💪</div>
+      <h2>Übungskatalog</h2>
+      <p class="widget-stat">
+        {{ exerciseCount }} Übungen in {{ muscleGroupCount }} Muskelgruppen
+      </p>
+      <a routerLink="/exercises" class="btn-widget">Öffnen</a>
+    </div>
+
+    <div class="widget">
+      <div class="widget-icon">🧑‍🏫</div>
+      <h2>Trainer</h2>
+      <p class="widget-stat">Trainer verwalten</p>
+      <a routerLink="/trainers" class="btn-widget">Öffnen</a>
+    </div>
+
+    @if (isAdmin) {
+      <div class="widget widget-admin">
+        <div class="widget-icon">👥</div>
+        <h2>Mitglieder</h2>
+        <p class="widget-stat">{{ memberCount }} Mitglieder registriert</p>
+        <a routerLink="/members" class="btn-widget">Verwalten</a>
+      </div>
+    }
   </div>
-}
+</div>

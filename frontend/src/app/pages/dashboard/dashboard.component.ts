@@ -1,34 +1,57 @@
-import { Component, OnInit, inject } from '@angular/core';
-import {AppAuthService} from '../../service/app.auth.service';
-import {HeaderService} from '../../service/header.service';
-
-import { AppLoginComponent } from '../../components/app-login/app-login.component';
-import { TranslateModule } from '@ngx-translate/core';
+import { Component, inject, ChangeDetectionStrategy, ChangeDetectorRef, OnInit } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { WorkoutPlanService } from '../../service/workout-plan.service';
+import { ExerciseService } from '../../service/exercise.service';
+import { MemberService } from '../../service/member.service';
+import { AppAuthService } from '../../service/app.auth.service';
+import { ROLES } from '../../app.roles';
 
 @Component({
-    selector: 'app-dashboard',
-    templateUrl: './dashboard.component.html',
-    styleUrls: ['./dashboard.component.scss'],
-    imports: [AppLoginComponent, TranslateModule]
+  selector: 'app-dashboard',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterLink],
+  templateUrl: './dashboard.component.html',
+  styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent implements OnInit {
+  private workoutPlanService = inject(WorkoutPlanService);
+  private exerciseService = inject(ExerciseService);
+  private memberService = inject(MemberService);
   private authService = inject(AppAuthService);
-  private headerService = inject(HeaderService);
+  private cdr = inject(ChangeDetectorRef);
 
-  useralias = '';
-  username = '';
+  myPlanCount = 0;
+  exerciseCount = 0;
+  muscleGroupCount = 0;
+  memberCount = 0;
+  isAdmin = false;
 
-  constructor() {
-    this.headerService.setPage('nav.dashboard');
+  get userName(): string {
+    return this.authService.getIdentityClaims()?.['preferred_username'] ?? 'User';
   }
 
   ngOnInit(): void {
-    this.authService.usernameObservable.subscribe(name => {
-      this.username = name;
-    });
-    this.authService.useraliasObservable.subscribe(alias => {
-      this.useralias = alias;
-    });
-  }
+    this.isAdmin = this.authService.hasRole(ROLES.UPDATE);
 
+    this.workoutPlanService.getMy().subscribe({
+      next: plans => { this.myPlanCount = plans.length; this.cdr.markForCheck(); },
+      error: () => { this.myPlanCount = 0; this.cdr.markForCheck(); },
+    });
+
+    this.exerciseService.getAll().subscribe({
+      next: exercises => {
+        this.exerciseCount = exercises.length;
+        this.muscleGroupCount = new Set(exercises.map(e => e.muscleGroup)).size;
+        this.cdr.markForCheck();
+      },
+    });
+
+    if (this.isAdmin) {
+      this.memberService.getAll().subscribe({
+        next: members => { this.memberCount = members.length; this.cdr.markForCheck(); },
+        error: () => { this.memberCount = 0; this.cdr.markForCheck(); },
+      });
+    }
+  }
 }

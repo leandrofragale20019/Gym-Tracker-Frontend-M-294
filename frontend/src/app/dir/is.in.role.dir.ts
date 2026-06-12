@@ -1,31 +1,28 @@
 import { Directive, Input, OnDestroy, OnInit, TemplateRef, ViewContainerRef, inject } from '@angular/core';
-import {Subject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
-import {AppAuthService} from '../service/app.auth.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { AppAuthService } from '../service/app.auth.service';
 
-@Directive({ selector: '[appIsInRole]' })
+@Directive({
+  selector: '[appIsInRole]',
+  standalone: true
+})
 export class IsInRoleDirective implements OnInit, OnDestroy {
+  @Input() appIsInRole = '';
+
   private viewContainerRef = inject(ViewContainerRef);
   private templateRef = inject<TemplateRef<any>>(TemplateRef);
   private authService = inject(AppAuthService);
-
-  @Input() appIsInRole = '';
-  stop$ = new Subject();
-  isVisible = false;
+  private stop$ = new Subject<void>();
+  private isVisible = false;
 
   ngOnInit() {
-    this.authService.getRoles().pipe(
-      takeUntil(this.stop$)
-    ).subscribe(roles => {
-      if (!roles) {
-        this.viewContainerRef.clear();
-      }
-      if (roles.includes(this.appIsInRole)) {
-        if (!this.isVisible) {
-          this.isVisible = true;
-          this.viewContainerRef.createEmbeddedView(this.templateRef);
-        }
-      } else {
+    this.authService.getRoles().pipe(takeUntil(this.stop$)).subscribe(roles => {
+      const hasRole = roles.includes(this.appIsInRole);
+      if (hasRole && !this.isVisible) {
+        this.isVisible = true;
+        this.viewContainerRef.createEmbeddedView(this.templateRef);
+      } else if (!hasRole) {
         this.isVisible = false;
         this.viewContainerRef.clear();
       }
@@ -33,6 +30,7 @@ export class IsInRoleDirective implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.stop$.next(null);
+    this.stop$.next();
+    this.stop$.complete();
   }
 }

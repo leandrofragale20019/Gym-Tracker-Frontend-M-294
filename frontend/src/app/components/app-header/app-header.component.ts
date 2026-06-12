@@ -1,30 +1,36 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import {HeaderService} from '../../service/header.service';
-import {Subscription} from 'rxjs';
-
-import { TranslateModule } from '@ngx-translate/core';
+import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { AppAuthService } from '../../service/app.auth.service';
+import { ROLES } from '../../app.roles';
 
 @Component({
-    selector: 'app-header',
-    templateUrl: './app-header.component.html',
-    styleUrls: ['./app-header.component.scss'],
-    imports: [TranslateModule]
+  selector: 'app-header',
+  templateUrl: './app-header.component.html',
+  styleUrls: ['./app-header.component.scss'],
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterLink, RouterLinkActive]
 })
-export class AppHeaderComponent implements OnInit, OnDestroy {
-  private headerService = inject(HeaderService);
+export class AppHeaderComponent {
+  private authService = inject(AppAuthService);
 
+  username = signal('');
+  isAdmin = signal(false);
+  isLoggedIn = signal(false);
 
-  currentPage = '';
-  private subPage?: Subscription;
-
-  async ngOnInit() {
-    this.subPage = this.headerService.pageObservable.subscribe(page => {
-      this.currentPage = page;
+  constructor() {
+    this.authService.useraliasObservable.subscribe(alias => {
+      this.username.set(alias);
+      this.isLoggedIn.set(this.authService.hasValidToken());
+      this.isAdmin.set(this.authService.hasRole(ROLES.UPDATE));
     });
   }
 
-  ngOnDestroy(): void {
-    this.subPage?.unsubscribe();
+  get roleLabel(): string {
+    return this.isAdmin() ? 'ADMIN' : 'USER';
   }
 
+  logout(): void {
+    this.authService.logout();
+  }
 }

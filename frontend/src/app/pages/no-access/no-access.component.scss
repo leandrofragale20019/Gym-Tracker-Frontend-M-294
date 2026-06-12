@@ -1,0 +1,30 @@
+.no-access-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.no-access-card {
+  text-align: center;
+  padding: 48px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+  .icon { font-size: 64px; margin-bottom: 16px; }
+  h2 { font-size: 24px; color: #d32f2f; margin-bottom: 8px; }
+  p { color: #666; margin-bottom: 24px; }
+}
+
+.btn-back {
+  display: inline-block;
+  background: #1976d2;
+  color: white;
+  padding: 10px 24px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 15px;
+
+  &:hover { background: #1565c0; }
+}
