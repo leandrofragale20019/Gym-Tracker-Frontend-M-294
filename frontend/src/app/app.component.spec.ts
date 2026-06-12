@@ -5,7 +5,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {MatMomentDateModule} from '@angular/material-moment-adapter';
 import {provideTranslateService} from '@ngx-translate/core';
 import { authConfig } from './app.config';
-import { AppRoutingModule } from './app-routing.module';
+import { RouterTestingModule } from '@angular/router/testing';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('AppComponent', () => {
@@ -13,7 +13,7 @@ describe('AppComponent', () => {
     await TestBed.configureTestingModule({
     imports: [
         OAuthModule.forRoot({ resourceServer: { sendAccessToken: true } }),
-        AppRoutingModule,
+        RouterTestingModule,
         MatMomentDateModule,
         AppComponent],
     providers: [
