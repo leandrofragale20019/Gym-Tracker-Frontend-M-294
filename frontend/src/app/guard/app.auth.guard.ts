@@ -1,50 +1,23 @@
-import {inject} from '@angular/core';
-import {ActivatedRouteSnapshot, CanActivateChildFn, CanActivateFn, Router, RouterStateSnapshot} from '@angular/router';
-import {OAuthService} from 'angular-oauth2-oidc';
-import {AppAuthService} from '../service/app.auth.service';
+import { inject } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivateChildFn, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
+import { AppAuthService } from '../service/app.auth.service';
 
-export const appCanActivate: CanActivateFn = (
-  route: ActivatedRouteSnapshot,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  state: RouterStateSnapshot
-) => {
-  const authService: AppAuthService = inject(AppAuthService);
-  const oauthService: OAuthService = inject(OAuthService);
+export const appCanActivate: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+  const authService = inject(AppAuthService);
   const router = inject(Router);
 
-  let userRoles: string[] = [];
-
-  authService.getRoles().subscribe(roles => {
-    userRoles = roles;
-  });
-
-  if (oauthService.hasValidAccessToken()) {
-    const hasRoles = checkRoles(route, userRoles);
-    if (!hasRoles) {
-      return router.parseUrl('/noaccess');
-    }
-    return hasRoles;
+  if (!authService.hasValidToken()) {
+    return router.parseUrl('/login');
   }
-  return router.parseUrl('/noaccess');
+
+  const requiredRoles: string[] = route.data['roles'] ?? [];
+  if (requiredRoles.length === 0) return true;
+
+  const hasRole = requiredRoles.some(role => authService.hasRole(role));
+  return hasRole ? true : router.parseUrl('/no-access');
 };
 
-function checkRoles(route: ActivatedRouteSnapshot, userRoles: string[]): boolean {
-  const roles = route.data['roles'] as Array<string>;
-
-  if (roles === undefined || roles === null || roles.length === 0) {
-    return true;
-  }
-
-  if (userRoles === undefined) {
-    return false;
-  }
-
-  for (const role of roles) {
-    if (userRoles.indexOf(role) > -1) {
-      return true;
-    }
-  }
-  return false;
-}
-
-export const appCanActivateChild: CanActivateChildFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => appCanActivate(route, state);
+export const appCanActivateChild: CanActivateChildFn = (
+  route: ActivatedRouteSnapshot,
+  state: RouterStateSnapshot
+) => appCanActivate(route, state);
